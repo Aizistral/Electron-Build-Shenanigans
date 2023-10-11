@@ -8,7 +8,7 @@ module.exports = {
         extraResource: [
             "./assets/favicon.ico",
             "./assets/favicon.png",
-            "./assets/window.png",
+            "./assets/favicon.icns"
         ]
     },
     rebuildConfig: {},

@@ -22,7 +22,7 @@ jobs:
       run: npm install
 
     - name: Build Electron app
-      run: npx electron-forge make
+      run: npx electron-forge make --platform linux --arch x64 --targets @reforged/maker-appimage
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
