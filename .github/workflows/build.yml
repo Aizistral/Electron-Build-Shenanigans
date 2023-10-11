@@ -7,7 +7,11 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'RELEASE_COMMIT_MARKER')"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]  # Default to Ubuntu for non-release commits
 
     steps:
     - name: Checkout code
@@ -22,9 +26,40 @@ jobs:
       run: npm install
 
     - name: Build Electron app
-      run: npx electron-forge make --platform linux --arch x64 --targets @reforged/maker-appimage
+      run: npx electron-forge make --platform linux --targets @reforged/maker-appimage
 
-    - name: Upload artifacts
+  release:
+    if: "contains(github.event.head_commit.message, 'RELEASE_COMMIT_MARKER')"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]  # Run on multiple OS for release commits
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build Electron app on Linux
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: npx electron-forge make --platform linux --targets @reforged/maker-appimage
+
+    - name: Build Electron app on macOS
+      if: ${{ matrix.os == 'macOS-latest' }}
+      run: npx electron-forge make --platform darwin --targets @electron-forge/maker-zip,@electron-forge/maker-dmg
+
+    - name: Build Electron app on Windows
+      if: ${{ matrix.os == 'windows-latest' }}
+      run: npx electron-forge make --platform win32 --targets @electron-forge/maker-squirrel
+
+    - name: Upload artifacts for release
       uses: actions/upload-artifact@v3
       with:
         name: release
