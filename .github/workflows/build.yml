@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
@@ -25,7 +25,7 @@ jobs:
       run: npx electron-forge make --platform linux --arch x64 --targets @reforged/maker-appimage
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: release
         path: out/make
